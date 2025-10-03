@@ -138,6 +138,10 @@
         box-shadow: 0 0 20px #ffb6c1;
       }
 
+      body.modal-open {
+        overflow: hidden;
+      }
+
       /* Confetti */
       .confetti {
         position: fixed;
@@ -191,6 +195,26 @@
         </div>
       </div>
     </div>
+
+    <!-- Ready Modal -->
+    <div
+      class="modal fade show"
+      id="readyModal"
+      tabindex="-1"
+      style="display: block"
+      aria-modal="true"
+      role="dialog"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-center p-4">
+          <h2 class="mb-3">🎂 Ready to blow the candles?</h2>
+          <button id="readyBtn" class="btn btn-primary btn-lg">Ready?</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal backdrop -->
+    <div class="modal-backdrop fade show"></div>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -253,6 +277,7 @@
 
             const audioContext = new (window.AudioContext ||
               window.webkitAudioContext)();
+            audioContext.resume();
             const source = audioContext.createMediaStreamSource(stream);
             const analyser = audioContext.createAnalyser();
             source.connect(analyser);
@@ -368,6 +393,36 @@
           // Start microphone detection after the small delay as requested
           startMic();
         }, 2000);
+      });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const readyModal = document.getElementById("readyModal");
+        const readyBtn = document.getElementById("readyBtn");
+        const backdrop = document.querySelector(".modal-backdrop");
+
+        // Lock scrolling
+        document.body.classList.add("modal-open");
+
+        readyBtn.addEventListener("click", () => {
+          // Hide modal
+          readyModal.style.display = "none";
+          readyModal.classList.remove("show");
+          if (backdrop) backdrop.remove();
+
+          // Unlock scrolling
+          document.body.classList.remove("modal-open");
+
+          // Show blow button and start mic
+          const btn = document.getElementById("blowBtn");
+          if (btn) {
+            btn.style.display = "inline-block";
+            btn.addEventListener("click", () => {
+              simulateBlow();
+              startMic(); // Mic starts only after user clicks
+              btn.disabled = true;
+            });
+          }
+        });
       });
     </script>
   </body>
