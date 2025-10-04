@@ -303,8 +303,26 @@
       // Confetti management variables
       let confettiActive = false;
       let confettiInterval = null;
-      const CONFETTI_DURATION = 4000; // 8 seconds of confetti
+      const CONFETTI_DURATION = 10000; // 10 seconds of confetti
       const CONFETTI_SPAWN_RATE = 200; // New confetti every 200ms
+
+      async function playSound(audioPath, timeInMiliseconds) {
+        const celebrationAudio = new Audio(audioPath);
+        celebrationAudio.loop = true;
+        celebrationAudio.preload = "auto";
+        celebrationAudio.volume = 0.9;
+        celebrationAudio.play().catch((error) => {
+          console.warn("audio not played ", error);
+        });
+        setTimeout(() => {
+          celebrationAudio.pause();
+          celebrationAudio.currentTime = 0;
+        }, timeInMiliseconds).catch((e) => {
+          consoel.warn("error stopping audio", e);
+        });
+
+        return celebrationAudio;
+      }
 
       function checkAllBlown() {
         // Query flames at the moment of checking so dynamically created candles are considered
@@ -340,9 +358,11 @@
         confettiActive = true;
         console.log("🎊 Confetti started!");
 
+        playSound("balloon-burst.mp3", 500);
+        playSound("funny-happy-birthday.mp3", 35000);
         // Create initial burst of confetti
         for (let i = 0; i < 15; i++) {
-          setTimeout(() => createSingleConfetti(), i * 50);
+          setTimeout(() => createSingleConfetti(), i * 100);
         }
 
         // Continue spawning confetti at regular intervals
@@ -375,6 +395,7 @@
         setTimeout(() => cake.classList.remove("blow-effect"), 500);
 
         // Trigger the same logic as a detected mic-blow
+        launchConfetti();
         onBlowDetected();
 
         // disable button after use
